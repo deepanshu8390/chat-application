@@ -1,6 +1,4 @@
-
-const dotenv = require("dotenv");
-dotenv.config({ path: "../.env" });
+require("dotenv").config();
 
 const express = require("express");
 const http = require("http");
@@ -15,60 +13,53 @@ const messageRoutes = require("./routes/message.routes.js");
 const { authMiddleware } = require("./middleware/auth.middleware.js");
 const { registerSocketServer, getOnlineUserIds } = require("./socket.js");
 
-// dotenv.config();
-
 const app = express();
 const server = http.createServer(app);
 
-// Basic Socket.IO setup (logic moved into socket.js)
+/* ================== OPEN CORS (ALLOW ALL) ================== */
+app.use(cors({
+  origin: true,        // allow any origin
+  credentials: true
+}));
+
+app.options("*", cors());
+
+/* ================== OPEN SOCKET.IO ================== */
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: true,
     methods: ["GET", "POST"],
+    credentials: true
   },
 });
 
 app.set("io", io);
-
 registerSocketServer(io);
 
-// Middleware
+/* ================== MIDDLEWARE ================== */
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    credentials: true,
-  })
-);
 
-// Health check
+/* ================== ROUTES ================== */
 app.get("/", (req, res) => {
-  res.json({ status: "okkk", onlineUsers: getOnlineUserIds() });
+  res.json({ status: "ok", onlineUsers: getOnlineUserIds() });
 });
-
-// Auth & chat APIs
-
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/messages", authMiddleware, messageRoutes);
 
-// Connect database and start server
+/* ================== SERVER START ================== */
 const PORT = process.env.PORT || 5000;
-console.log("ENV CHECK:", process.env.MONGO_URI);
 
-
-mongoose
-  .connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB");
     server.listen(PORT, () => {
-      console.log(`Backend listening on http://localhost:${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
     console.error("Mongo connection error:", err.message);
     process.exit(1);
   });
-
