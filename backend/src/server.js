@@ -44,10 +44,12 @@ app.use(
 
 // Health check
 app.get("/", (req, res) => {
-  res.json({ status: "ok", onlineUsers: getOnlineUserIds() });
+  res.json({ status: "okkk", onlineUsers: getOnlineUserIds() });
 });
 
 // Auth & chat APIs
+app.use("/api/auth", require("./routes/auth.routes.js"));
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/messages", authMiddleware, messageRoutes);
