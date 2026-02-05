@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
 });
 
 // Auth & chat APIs
-app.use("/api/auth", require("./routes/auth.routes.js"));
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
