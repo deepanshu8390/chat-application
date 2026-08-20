@@ -1,16 +1,20 @@
 const { User } = require("../models/User.js");
+const { MongoUserRepository } = require("../repositories/MongoUserRepository.js");
+const { UserService } = require("../services/UserService.js");
+
+const userService = new UserService({
+  repository: new MongoUserRepository(User),
+});
 
 // GET /api/users
 async function listUsers(req, res) {
   try {
-    const currentUserId = req.user._id;
-    const users = await User.find({ _id: { $ne: currentUserId } }).select(
-      "-password -resetToken -resetExpires"
-    );
+    const users = await userService.listUsers(req.user._id);
     res.json(users);
   } catch (err) {
     console.error("listUsers error:", err.message);
-    res.status(500).json({ error: "Internal server error" });
+    const status = err.message === "Not authenticated" ? 401 : 500;
+    res.status(status).json({ error: err.message || "Internal server error" });
   }
 }
 

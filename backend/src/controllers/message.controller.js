@@ -21,7 +21,7 @@ async function getMessages(req, res) {
   }
 }
 
-// POST /api/messages/:userId
+// POST /api/messages/:userId ( dynamic routing here)
 async function sendMessage(req, res) {
   try {
     const { text } = req.body;
