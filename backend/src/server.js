@@ -1,6 +1,7 @@
 
+const path = require("path");
 const dotenv = require("dotenv");
-dotenv.config({ path: "../.env" });
+dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 const express = require("express");
 const http = require("http");
@@ -65,11 +66,12 @@ app.use("/api/messages", authMiddleware, messageRoutes);
 
 // Connect database and start server
 const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
 console.log("ENV CHECK:", process.env.MONGO_URI);
 
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB");
     server.listen(PORT, () => {

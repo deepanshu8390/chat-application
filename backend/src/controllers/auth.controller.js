@@ -1,3 +1,4 @@
+const { User } = require("../models/User.js");
 const { MongoUserRepository } = require("../repositories/MongoUserRepository.js");
 const { AuthService } = require("../services/AuthService.js");
 
